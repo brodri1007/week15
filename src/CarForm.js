@@ -6,7 +6,7 @@ import Container from 'react-bootstrap/Container';
   
 
 
-export default function CarForm ()  {
+export default function CarForm ({setAppointments})  {
 
 // function AddNewCar() { 
 
@@ -56,20 +56,7 @@ return (
     </div>
   </form>
   </div>
-  <div className='col'>
-  <form id="Form">
-    <div className="submitForm">
-      <h4 className="pt-5 ">Scheduled appointments</h4>
-      <div>
-        <label htmlFor="idUpdate" className="form-label">Id</label>
-       <p>  </p><br/>
-       <p>  </p><br/><br/>
-      </div>    
-        <button >Delete</button> 
-        <br/><br/><br/><br/><br/>
-    </div>
-  </form>
-  </div>
+  
   </div>
 </Container>
 )   

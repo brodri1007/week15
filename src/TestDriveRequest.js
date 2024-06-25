@@ -14,39 +14,30 @@ function TestDriveRequest(props) {
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState('');
   const [apptDate, setApptdate] = useState(new Date()); 
+  const [appointments, setAppointment] = useState([]); 
  
-
-  const setAppointment = props.setAppointment;
-  //const appt = [...props.appt.appointment];
-
   const make = props.cardetails.make;
   const model = props.cardetails.model;
   const year = props.cardetails.year;
-
- const appoint = props.appt.appointment.email;
-console.log("New: " + appoint)
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
  
   const handleScheduleIt = (e) => {
   
-    const newItem = {
-        id: Math.random(),
-        email: email,
-        date:  apptDate,     
+        const newItem = {
+            id: Math.random(),
+            email: email,
+            date:  apptDate,     
+        };
+    
+
+        if (apptDate) {
+            setAppointment([...appointments, newItem]);    
+            setEmail("");
+            setApptdate(null); 
+        }
     };
-
-    //console.log(appointment);
-
-    // if (apptDate) {
-    //     setAppointment([...appt, newItem]);
-    //     setAppointment("");
-    //     setEmail("");
-    //     setApptdate(null); 
-
-    // }
-};
 
 
   return (
@@ -74,12 +65,9 @@ console.log("New: " + appoint)
             </Form.Group>
             <Form.Group
               className="mb-3"
-              controlId="exampleForm.ControlTextarea1"
-            >
-              <Form.Label>Select the day and time.</Form.Label>           
-
+              controlId="exampleForm.ControlTextarea1">
+              <Form.Label>Select the day and time.</Form.Label> 
                 <DatePicker selected={apptDate} onChange={(date) => setApptdate(date)} />
-
             </Form.Group>
           </Form>
         </Modal.Body>
