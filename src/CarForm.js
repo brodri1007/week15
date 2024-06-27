@@ -3,8 +3,11 @@ import Container from 'react-bootstrap/Container';
 
 const API_URL = "https://6659cc10de346625136df8bb.mockapi.io/cars/car";
 
+
+//Receive function from parent to for form actions
 export default function CarForm({ handleClick }) {
 
+//set state for formValues
   const [formValues, setFormValues] = useState({
     id: '', 
     brand: '',
@@ -14,6 +17,8 @@ export default function CarForm({ handleClick }) {
     price: ''
   });
 
+
+  //Set values in the formValues array based on form field's names
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormValues({
@@ -22,24 +27,30 @@ export default function CarForm({ handleClick }) {
     });
   };
 
+
+
   const handleSubmit = (event) => {
+
     event.preventDefault();
-    console.log(formValues);
+   //Need to be able to not submit if there is no car data in the form  -----  if(!formValues.brand === null) {
 
-   
 
+   //Declare request options for API fetch
     const requestOptions = {
       method: "POST",
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formValues)
     };
 
+    //fecth cars from  API adding new car entry
     fetch(API_URL, requestOptions)
       .then(async response => {
         if (!response.ok) {
           console.log("An Error Occurred");
           return;
         }
+
+        //Call function to re-render ui
         handleClick();
       })
       .catch(error => {
@@ -53,9 +64,11 @@ export default function CarForm({ handleClick }) {
         miles: '',
         year: '',               
         price: ''
-      })
+      }) 
 
-
+    // }else {
+    //     alert("Please enter the car's infomation to continue.")
+    // }
 
   };
 

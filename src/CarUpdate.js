@@ -7,6 +7,8 @@ export default function CarUpdate({ handleClick, car, showHide}) {
 
   const API_URL = "https://6659cc10de346625136df8bb.mockapi.io/cars/car/" + car.id;
 
+  //Declare formValues state for upding the API
+
   const [formValues, setFormValues] = useState({
     id: car.id, 
     brand: car.brand,
@@ -16,6 +18,7 @@ export default function CarUpdate({ handleClick, car, showHide}) {
     price: car.price
   });
 
+  //Set values in the formValues array based on form field's names
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormValues({
@@ -27,6 +30,7 @@ export default function CarUpdate({ handleClick, car, showHide}) {
   const handleSubmit = (event) => {
     event.preventDefault();
 
+  //Prepare fetch request for upding the API. Set values to the form inputs new values
     const requestOptions = {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -39,13 +43,15 @@ export default function CarUpdate({ handleClick, car, showHide}) {
       })
   };
 
-
+ //fecth cars from API updating the car entry
     fetch(API_URL, requestOptions)
       .then(async response => {
         if (!response.ok) {
           console.log("An Error Occurred");
           return;
         }
+        
+//Call function to re-render ui
         handleClick();
       })
       .catch(error => {
