@@ -1,146 +1,107 @@
-import { useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import CarForm from "./CarForm";
-
-import Container from 'react-bootstrap/Container';
-//import TestDriveRequest from "./TestDriveRequest"
-import Row from 'react-bootstrap/Row';
+import React, { useEffect, useState } from 'react';
 import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'react-datepicker/dist/react-datepicker.css';
+import CarForm from './CarForm';
+import Container from 'react-bootstrap/esm/Container';
+import CarUpdate from './CarUpdate';
 
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import Modal from 'react-bootstrap/Modal';
-import DatePicker from "react-datepicker";
-import Schedule from './Schedule';
-
+const API_URL = "https://6659cc10de346625136df8bb.mockapi.io/cars/car";
 
 function App() {
 
-  const [show, setShow] = useState(false);
-  const [email, setEmail] = useState('');
-  const [apptDate, setApptdate] = useState(new Date());
-  const [appointments, setAppointments] = useState([]);
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
-  const { data, error, isloading } = useQuery({
-    queryKey: ['car'],
-    queryFn: () =>
-      fetch("https://6659cc10de346625136df8bb.mockapi.io/cars/car").then((res) =>
-        res.json()),
-  });
+  const [carList, setCarList] = useState([]);
 
 
-  const handleScheduleIt = (e) => {
+  const getCars = async () => {
+    const response = await fetch(API_URL).then(
+      (response) => response.json());
+    setCarList(response)
+  }
 
-    const newItem = {
-      id: Math.random(),
-      email: email,
-      date: apptDate,
+  useEffect(() => {
+    getCars();
+  }, []);
+
+
+  function handleClick() {
+    getCars();
+  }
+
+  function showHide(id) {
+    var el = document.getElementById(id);
+    if (el && el.style.display === 'none')
+      el.style.display = 'block';
+    else
+      el.style.display = 'none';
+  }
+
+
+  function DeleteCar(id) {
+    const requestOptions = {
+      method: "DELETE",
+      headers: { 'Content-Type': 'application/json' },
+
     };
 
-    if (apptDate) {
-      setAppointments([...appointments, newItem]);
-      setEmail("");
-      setApptdate(null);
-    }
+    fetch(API_URL + '/' + id, requestOptions)
+      .then(async response => {
+        if (!response.ok) {
+          console.log("An Error Occurred");
+          return;
+        }
+        handleClick();
+      })
+      .catch(error => {
+        console.error("There was an error!", error);
+      });
 
-   
-      handleClose()
-  };
 
 
-  if (error) return <div>There was an error!</div>;
-  if (isloading) return <div>Data is loading...</div>;
 
-  function DeleteCar(carid) {
-    fetch(`https://6659cc10de346625136df8bb.mockapi.io/cars/car/${carid}`, {
-      method: "DELETE",
-    })
-  };
+  }
 
 
   return (
-    <>
-      <div className="App" >
-        <Container>
-          <h1 className="header">The Car Shop</h1>
-          <Row>
-            {data?.map((car, i) => {
-              return (
-                <Col md="auto">
-                  <div className="col p-3 border bg-light" key={car.id}>
-                    <div><span>{car.id}</span> <img alt={car.model} src={require("./car.png")} width="150px" /></div>
-                    <span>{car.make}</span>
-                    <span>{car.model}</span> <br />
-                    <span>Miles: {car.mileage}</span><br />
-                    <span>Year: {car.year.substring(0, 4)}</span><br />
-                    <span>Price: {car.price}</span>
-                    <button className="btn" onClick={() => DeleteCar(car.id)} >🗑</button>
-                    <Button variant="primary" onClick={handleShow}>
-                    Test-drive me!
-                  </Button>
+    <div className="App">
+      <div><h1 className="header">The Car Shop</h1></div>
+      <Container>
+        <Row>
+          {carList?.map((car) => (
+            <Col md="auto" key={car.id} className='d-md-flex'>
+              <div className="car-card">
+                <div className="col p-3 border bg-light">
+                  <div>
+                    <span>{car.id}</span>
+                    <img alt={car.model} src={require("./car.png")} width="150px" />
                   </div>
-      
+                  <span>Brand-Model: {car.brand} {car.model}</span>
+                  <br />
+                  <span>Miles: {car.miles}</span><br />
+                  <span>Year: {car.year.substring(0, 4)}</span><br />
+                  <span>Price: {car.price}</span>
+                  <button onClick={() => DeleteCar(car.id)} className="btn">🗑</button>
+                  <button onClick={() => showHide(car.id)} className="btn">Edit</button>
+                  <br></br>
+                  <Col ><span id={car.id} style={{ display: "none" }}><CarUpdate handleClick={handleClick} showHide={showHide} car={car} /> </span> </Col>
+                </div>
+                <br></br><br></br>
+              </div>
+
+            </Col>
+          )
+          )}
+        </Row>
+      </Container>
+      <Row>
+        <Col className='d-md-flex' > <CarForm handleClick={handleClick} /></Col>
+      </Row>
 
 
 
-                  <Modal show={show} onHide={handleClose}>
-                    <Modal.Header closeButton>
-                      <Modal.Title>Request an appointment</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                      <Form>
-                        <Form.Label><img alt={car.model} src={require("./car.png")} width="150px" /><br></br>You're requesting to schedule a test drive for this {car.year.substring(0, 4)} <br></br>{car.make} {car.model}.</Form.Label>
-                        <Form.Label>Enter your email address</Form.Label>
-                        <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                          <Form.Control
-                            type="email"
-                            placeholder="name@example.com"
-                            autoFocus
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                          />
-                        </Form.Group>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="exampleForm.ControlTextarea1">
-                          <Form.Label>Select the day and time.</Form.Label>
-                          <DatePicker 
-                            selected={apptDate} 
-                            onChange={(date) => setApptdate(date)}
-                            showTimeSelect
-                           />
-                        </Form.Group>
-                      </Form>
-                    </Modal.Body>
-                    <Modal.Footer>
-                      <Button variant="secondary" onClick={handleClose}>
-                        Cancel
-                      </Button>
-                      <Button variant="primary" onClick={handleScheduleIt}>
-                        Schedule it!
-                      </Button>
-                    </Modal.Footer>
-                  </Modal>
-                </Col>
-              )
-            }
-            )}
-          </Row>
-    
-          <CarForm setAppointment={setAppointments} />
-          <Schedule appointments={appointments} />
-        </Container>
-      </div>
-
-
-    </>
-
-  )
-
+    </div>
+  );
 }
-
 export default App;

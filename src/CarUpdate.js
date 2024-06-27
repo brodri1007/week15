@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import Container from 'react-bootstrap/Container';
 
-const API_URL = "https://6659cc10de346625136df8bb.mockapi.io/cars/car";
 
-export default function CarForm({ handleClick }) {
+
+export default function CarUpdate({ handleClick, car, showHide}) {
+
+  const API_URL = "https://6659cc10de346625136df8bb.mockapi.io/cars/car/" + car.id;
 
   const [formValues, setFormValues] = useState({
-    id: '', 
-    brand: '',
-    model: '',
-    miles: '',
-    year: '',               
-    price: ''
+    id: car.id, 
+    brand: car.brand,
+    model: car.model,
+    miles: car.miles,
+    year: car.year,               
+    price: car.price
   });
 
   const handleChange = (event) => {
@@ -24,15 +26,19 @@ export default function CarForm({ handleClick }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(formValues);
-
-   
 
     const requestOptions = {
-      method: "POST",
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formValues)
-    };
+      body: JSON.stringify({        
+        brand: formValues.brand,
+        model: formValues.model,
+        miles: formValues.miles,
+        year: formValues.year,               
+        price: formValues.price
+      })
+  };
+
 
     fetch(API_URL, requestOptions)
       .then(async response => {
@@ -45,16 +51,6 @@ export default function CarForm({ handleClick }) {
       .catch(error => {
         console.error("There was an error!", error);
       });
-
-      setFormValues({  
-        id: '',    
-        brand: '',
-        model: '',
-        miles: '',
-        year: '',               
-        price: ''
-      })
-
 
 
   };
@@ -69,52 +65,51 @@ export default function CarForm({ handleClick }) {
                 type="hidden"
                 id="id"
                 name="id"
-                value={formValues.id}
-                onChange={handleChange}
-              />
-              <label htmlFor="brand"></label>
+                value={car.id}
+                onChange={handleChange}/>
+              <label htmlFor="brand">Brand:</label>
               <input
-              placeholder='Enter the brand'
                 type="text"
                 id="brand"
                 name="brand"
                 value={formValues.brand}
                 onChange={handleChange}
               />
-          
-              <label htmlFor="model"></label>
+            </div>
+            <div>
+              <label htmlFor="model">Model:</label>
               <input
-              placeholder='Enter the model'
                 type="text"
                 id="model"
                 name="model"
                 value={formValues.model}
                 onChange={handleChange}
               />
-        
-              
+            </div>
+            <div>
+              <label htmlFor="miles">Miles:</label>
               <input
-              placeholder='How many miles'
                 type="text"
                 id="miles"
                 name="miles"
                 value={formValues.miles}
                 onChange={handleChange}
               />
-         
-              
+            </div>
+            <div>
+              <label htmlFor="year">Year:</label>
               <input
-              placeholder='Enter the Year'
                 type="text"
                 id="year"
                 name="year"
                 value={formValues.year}
                 onChange={handleChange}
               />
+            </div>
            
-              
+            <div>
+              <label htmlFor="price">Price:</label>
               <input
-              placeholder='Enter a price'
                 type="text"
                 id="price"
                 name="price"
@@ -122,7 +117,8 @@ export default function CarForm({ handleClick }) {
                 onChange={handleChange}
               />
             </div>
-            <button type="submit">Add a Car</button>
+            <button type="submit">Update Car</button>
+            <button onClick={() => showHide(formValues.id)} type="submit">Close</button>
           </form>
         </div>
       </div>
